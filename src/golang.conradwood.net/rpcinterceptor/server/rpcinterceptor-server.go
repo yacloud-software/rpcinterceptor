@@ -220,7 +220,7 @@ func (ri *requestinfo) DoInterceptRPC(ctx context.Context, req *ic.InterceptRPCR
 			// we only got a v1 signed user
 			ru, err := rev.AsRootGetUserByID(ctx, req.InMetadata.User.ID)
 			if err != nil {
-				fmt.Printf("Failed to get user: %s\n", err)
+				fmt.Printf("Failed to get user: %s\n", utils.ErrorString(err))
 				return nil, err
 			}
 			if ru != nil {
