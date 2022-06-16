@@ -7,3 +7,4 @@ server:
 #access-checks.go
 rpcaclapi:
 	cd rpcaclapi/server && go install rpcaclapi-server.go
+	cd rpcaclapi/client && go install rpcaclapi-client.go
