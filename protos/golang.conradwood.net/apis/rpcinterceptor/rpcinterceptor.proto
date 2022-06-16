@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package rpcinterceptor;
+option java_package = "net.conradwood.golang.apis.rpcinterceptor";
+import "golang.conradwood.net/apis/auth/auth.proto";
+import "golang.conradwood.net/apis/common/common.proto";
+
+enum RejectReason {
+  NonSpecific = 0;     // can't really tell why it was rejected. use sparsely
+  UserRejected = 1;    // user not allowed to access this RPC
+  ServiceRejected = 2; // service not allowed to access this RPC
+  OrgRejected = 3;     // org not allowed to access this RPC
+  UserMissing = 4;     // user required but no credentials passed into the RPC
+  ServiceMissing = 5;  // service required but no credentials passed into the RPC
+  OrgMissing = 6;      // organisation required but no credentials passed into the RPC
+}
+
+message InterceptRPCResponse {
+  string RequestID = 1;          // The unique request id (created on-the-fly or mirrors what was passed in)
+  auth.User CallerService = 2;   // details of the service (the caller)
+  auth.User CallerUser = 3;      // details of the user (the caller)
+  auth.User CallerSudoUser = 4;  // not used yet (intented for e.g. servicedesk)
+  bool Reject = 6;               // if true, go-framework must and shall reject the call
+  RejectReason RejectReason = 7; // set if call is to be rejected
+  uint64 CallerMethodID = 8;     // rpcinterceptor internal methodid of service.method in the Request
+  string Source = 9;             // wtf?
+  uint64 CalleeServiceID = 10;   // the callee (the one calling the RPC being intercepted)
+  auth.SignedUser SignedCallerService=11;  // details of the service (the caller)
+  auth.SignedUser SignedCallerUser=12; // details of the user (the caller)
+  auth.SignedUser SignedCallerSudoUser=13; // not used yet (intented for e.g. servicedesk)
+}
+message ServiceByUserIDRequest {
+  string UserID=1;
+}
+message Service {
+  uint64 ID = 1;
+  string Name = 2;   // the name, e.g. auth.AuthenticationService
+  string UserID = 3; // the corresponding user account for this service
+}
+
+message InterceptRPCRequest {
+  InMetadata InMetadata = 1; // We don't need to transport it via Context if calling RPC Interceptor
+  string Service = 2;        // service being called
+  string Method = 3;         // method being called
+  string Source = 4; // some human-readable string of where the call comes from. Only set as "last-resort", e.g. if no user/service was provided by metadata
+}
+message CTXRoutingTags {
+  map<string,string> Tags=1;
+  bool FallbackToPlain=2; // if true, fallback to any service with NO tags, if no service with MATCHING tags is found
+  bool Propagate=3;  // if true, propagate as part of the rpc call
+}
+
+// the stuff we're transporting within a context between services
+message InMetadata {
+  string RequestID = 1; // The unique request id (created on-the-fly or mirrors what was passed in)
+  string FooBar = 2;
+  string UserToken = 3;       // we transport usertoken in case of cli->module.
+  string ServiceToken = 4;    // the service token in context determines the trustworthiness of the context
+  string UserID = 5;          // we transport userid in case of module->modul.e
+  uint64 CallerMethodID = 7;  // the rpcinterceptors' internal methodid so we know where the request came from. trustworthy only if servicetoken is valid
+  uint64 CallerServiceID = 8; // the calling serviceID
+  uint32 RoutingInfo = 9;     // set to non-zero if calls should be routed special, e.g. to experimental APIs
+  uint32 Version = 10;        // [V2] = 0:original,1:reserved, 2:"Version2"
+  auth.User Service = 11;     // [V2] - the calling service
+  auth.User User = 12;        // [V2] - the calling user
+  auth.SignedUser SignedService = 13;     // [V3] - the calling service
+  auth.SignedUser SignedUser = 14;        // [V3] - the calling user
+  bool Trace=15; // true if 'trace' calls, that is, we log each rpc call being made with this context
+  bool Debug=16; // true if calls with this context should have extra debug output
+  auth.SignedSession SignedSession=17; // Session
+  CTXRoutingTags RoutingTags=18; // optional routing tags
+}
+
+message LogErrorRequest {
+  InMetadata InMetadata = 1; // We don't need to transport it via Context if calling RPC Interceptor
+  string Service = 2;        // service being called
+  string Method = 3;         // method being called
+  uint32 ErrorCode = 4;      // default: 0 (e.g. if it's not a grpc error but a common error)
+  string DisplayMessage = 5; // result of error.String()
+  string LogMessage = 6;     // "" or, if it's a grpc error, it's error.Details()
+}
+
+message ServiceIDRequest {
+  string Token = 1;  // my token which I want to turn into a serviceID
+  string MyName = 2; // need this because rpcinterceptor might have to assign a serviceid on-the-fly for new services
+}
+message ServiceIDResponse {
+  uint64 ServiceID = 2;
+}
+
+message Learning {
+  uint64 ToServiceID = 1;
+  uint64 FromServiceID = 2;
+  string UserID = 3;
+  uint64 Count = 4;
+}
+
+message Learnings {
+  repeated Learning Learnings = 1;
+}
+
+/*
+This service is called by each RPC, thus it is very high-traffic, needs low-latency and
+high availability. (the concept is even questionable - it does pose a bottleneck and a
+scalability issue if the backends, e.g. I/O do not scale with it)
+However it is benefitial for auditing and access control purposes. Eventually we might cache the information on the client,
+even long-term.
+The naming is from the RPCInterceptors' view. The "Caller" refers to whomever or whatever is calling
+an RPC. For example, if "fooservice" calls "barservice", the "Caller" is "fooservice".
+We call "barservice" the callee.
+The UserID is an independent concept, it is simple the "User" as which the RPC is running.
+*/
+service RPCInterceptorService {
+  // extract useful information from a context
+  rpc InterceptRPC(InterceptRPCRequest) returns (InterceptRPCResponse);
+  // log an rpc error
+  rpc LogError(LogErrorRequest) returns (common.Void);
+  // get a serviceID by token (bootstrapping servers)
+  rpc GetMyServiceID(ServiceIDRequest) returns (ServiceIDResponse);
+  // if in learning mode, we can retrieve what has been learned so far:
+  rpc GetLearnings(common.Void) returns (Learnings);
+  // reset learnings...
+  rpc ClearLearnings(common.Void) returns (common.Void);
+  // given a userid for a service, this will return the rpcinterceptor service
+  rpc GetServiceByUserID(ServiceByUserIDRequest) returns (Service);
+
+}
+
