@@ -1,6 +1,6 @@
 // client create: RPCACLServiceClient
 /* geninfo:
-   filename  : golang.conradwood.net/apis/rpcaclapi/rpcaclapi.proto
+   filename  : protos/golang.conradwood.net/apis/rpcaclapi/rpcaclapi.proto
    gopackage : golang.conradwood.net/apis/rpcaclapi
    importname: ai_0
    varname   : client_RPCACLServiceClient_0

@@ -8,7 +8,7 @@ import (
 	"golang.conradwood.net/go-easyops/client"
 	"golang.conradwood.net/go-easyops/tokens"
 	"golang.conradwood.net/go-easyops/utils"
-	"golang.conradwood.net/learn"
+	"golang.conradwood.net/rpcinterceptor/learn"
 	"os"
 )
 
