@@ -211,8 +211,8 @@ message ServiceByIDRequest {
 service RPCACLService {
   // given a serviceid for a service, this will return the rpcinterceptor service
   rpc GetServiceByID(ServiceByIDRequest) returns (Service);
-  // given a userid for a service, this will return the rpcinterceptor service
-  //rpc GetServiceByUserID(ServiceByUserIDRequest) returns (Service);  // get ALL services currently known
+  // given a userid for a service, this will return the rpcinterceptor service (known user: scupdate)
+  rpc GetServiceByUserID(ServiceByUserIDRequest) returns (Service);  // get ALL services currently known
   // (known means: a method of this service has requested authentication at least once.)
   //rpc GetServices(common.Void) returns (ServiceList);
   // get all methods currently known for a given service
