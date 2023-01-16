@@ -7,7 +7,6 @@ import (
 	"golang.conradwood.net/go-easyops/authremote"
 	"golang.conradwood.net/go-easyops/cache"
 	"golang.conradwood.net/go-easyops/common"
-	"golang.conradwood.net/go-easyops/tokens"
 	"time"
 )
 
@@ -51,7 +50,7 @@ func (r *Resolvers) AsRootGetUserByID(ctx context.Context, id string) (ResolvedU
 	}
 
 	vr := apb.ByIDRequest{UserID: id}
-	ctx = tokens.ContextWithToken() // we need to call it with our context. only we have permission to do this
+	ctx = authremote.Context() // we need to call it with our context. only we have permission to do this
 	det, err := authManager.SignedGetUserByID(ctx, &vr)
 	if err != nil {
 		return nil, err
