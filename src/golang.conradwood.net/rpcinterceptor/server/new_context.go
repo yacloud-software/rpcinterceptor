@@ -28,5 +28,17 @@ func deprecate_rpc_interceptor(ictx context.Context, req *ic.InterceptRPCRequest
 		SignedCallerService: ls.CallingService(),
 		SignedCallerUser:    ls.User(),
 	}
+	mt := req.InMetadata
+	if mt != nil {
+		if res.SignedCallerService == nil {
+			res.SignedCallerService = mt.SignedService
+			res.CallerService = common.VerifySignedUser(res.SignedCallerService)
+		}
+		if res.SignedCallerUser == nil {
+			res.SignedCallerUser = mt.SignedUser
+			res.CallerUser = common.VerifySignedUser(res.SignedCallerUser)
+		}
+	}
+
 	return res, nil
 }
