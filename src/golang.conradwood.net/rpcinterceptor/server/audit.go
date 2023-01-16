@@ -1,12 +1,12 @@
 package main
 
 import (
+    "golang.conradwood.net/go-easyops/authremote"
 	"flag"
 	"fmt"
 	"golang.conradwood.net/go-easyops/prometheus"
 	rc "golang.conradwood.net/apis/rpcaclapi"
 	"golang.conradwood.net/go-easyops/sql"
-	"golang.conradwood.net/go-easyops/tokens"
 	"golang.conradwood.net/go-easyops/utils"
 	"golang.org/x/net/context"
 	"sync"
@@ -125,7 +125,7 @@ func entryExists(a *knownACL) bool {
 		fmt.Printf("audit1: Failed to connect to db: %s\n", err)
 		return false
 	}
-	rows, err := db.QueryContext(tokens.ContextWithToken(), "select_audit_entry", "select id from methodaudit where methodid = $1 and serviceuserid = $2 and userid = $3 and sourceid = $4", a.method, a.sid, a.uid, a.source)
+	rows, err := db.QueryContext(authremote.Context(), "select_audit_entry", "select id from methodaudit where methodid = $1 and serviceuserid = $2 and userid = $3 and sourceid = $4", a.method, a.sid, a.uid, a.source)
 	if err != nil {
 		fmt.Printf("could not select methodaudit row: %s\n", err)
 		return false
@@ -143,7 +143,7 @@ func saveEntry(a *knownACL) {
 		fmt.Printf("audit2: Failed to connect to db: %s\n", err)
 		return
 	}
-	_, err = db.ExecContext(tokens.ContextWithToken(), "insert_audit_entry", "insert into methodaudit (methodid,serviceuserid,userid,sourceid,calls) values ($1,$2,$3,$4,$5)", a.method, a.sid, a.uid, a.source, a.calls)
+	_, err = db.ExecContext(authremote.Context(), "insert_audit_entry", "insert into methodaudit (methodid,serviceuserid,userid,sourceid,calls) values ($1,$2,$3,$4,$5)", a.method, a.sid, a.uid, a.source, a.calls)
 	if err != nil {
 		fmt.Printf("could not insert methodaudit row: %s\n", err)
 	}
@@ -155,7 +155,7 @@ func updateEntry(a *knownACL) {
 		fmt.Printf("audit3: Failed to connect to db: %s\n", err)
 		return
 	}
-	_, err = db.ExecContext(tokens.ContextWithToken(), "update_audit_entry", "update methodaudit set calls = calls + $1 where id = $2", a.calls, a.id)
+	_, err = db.ExecContext(authremote.Context(), "update_audit_entry", "update methodaudit set calls = calls + $1 where id = $2", a.calls, a.id)
 	if err != nil {
 		fmt.Printf("could not update methodaudit row: %s\n", err)
 	}

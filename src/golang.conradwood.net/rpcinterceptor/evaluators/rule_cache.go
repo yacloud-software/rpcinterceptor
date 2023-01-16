@@ -1,11 +1,11 @@
 package evaluators
 
 import (
+    "golang.conradwood.net/go-easyops/authremote"
 	"flag"
 	"fmt"
 	ra "golang.conradwood.net/apis/rpcaclapi"
 	"golang.conradwood.net/go-easyops/cache"
-	"golang.conradwood.net/go-easyops/tokens"
 	"strconv"
 	"time"
 )
@@ -39,7 +39,7 @@ func (r *ruleEvaluator) get_service_rules_by_key(key string) (interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	ctx := tokens.ContextWithToken()
+	ctx := authremote.Context()
 	res, err := r.dbrules.GetRulesForService(ctx, &ra.ServiceID{ID: serviceid})
 	if err != nil {
 		return nil, err

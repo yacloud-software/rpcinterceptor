@@ -15,7 +15,6 @@ import (
 	"golang.conradwood.net/go-easyops/prometheus"
 	"golang.conradwood.net/go-easyops/server"
 	"golang.conradwood.net/go-easyops/sql"
-	"golang.conradwood.net/go-easyops/tokens"
 	"golang.conradwood.net/go-easyops/utils"
 	"golang.conradwood.net/rpcinterceptor/evaluators"
 	"golang.conradwood.net/rpcinterceptor/learn"
@@ -113,8 +112,16 @@ func (e *rpcInterceptorServer) InterceptRPC(ctx context.Context, req *ic.Interce
 		fmt.Printf("RPC response mocked (%s/%s()).\n", req.Service, req.Method)
 		return &ic.InterceptRPCResponse{}, nil
 	}
+
+	resp, err := deprecate_rpc_interceptor(ctx, req) // rpcinterceptor is deprecated, try codepath which just repeats back what it gets
+	if err != nil {
+		return nil, err
+	}
+	if resp != nil {
+		return resp, nil
+	}
 	ri := &requestinfo{}
-	resp, err := ri.DoInterceptRPC(ctx, req)
+	resp, err = ri.DoInterceptRPC(ctx, req)
 	if err != nil {
 		return resp, err
 	}
@@ -570,7 +577,7 @@ func logError(ctx context.Context, req *ic.InterceptRPCRequest, resp *ic.Interce
 		LogMessage:   fmt.Sprintf("rpcinterceptor denied access to service (rpc_service_id=%s) from %s %s", service_id, userdesc, servicedesc),
 		RequestID:    reqid,
 	}
-	ctx = tokens.ContextWithToken()
+	ctx = authremote.Context()
 	_, err := el.GetErrorLoggerClient().Log(ctx, e)
 	if err != nil {
 		fmt.Printf("unable to log error: %s\n", err)
