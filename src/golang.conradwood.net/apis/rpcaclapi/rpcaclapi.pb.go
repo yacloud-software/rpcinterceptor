@@ -1075,55 +1075,8 @@ const _ = grpc.SupportPackageIsVersion4
 type RPCACLServiceClient interface {
 	// given a serviceid for a service, this will return the rpcinterceptor service
 	GetServiceByID(ctx context.Context, in *ServiceByIDRequest, opts ...grpc.CallOption) (*Service, error)
-	// given a userid for a service, this will return the rpcinterceptor service
+	// given a userid for a service, this will return the rpcinterceptor service (known user: scupdate)
 	GetServiceByUserID(ctx context.Context, in *ServiceByUserIDRequest, opts ...grpc.CallOption) (*Service, error)
-	// (known means: a method of this service has requested authentication at least once.)
-	// rpc GetServices(common.Void) returns (ServiceList);
-	// get all methods currently known for a given service
-	// (known means: the method has requested authentication at least once.)
-	// rpc GetMethods(GetMethodsRequest) returns (MethodList);
-	// get all groups known to the auth service.
-	// essentially queries & caches the auth service
-	// OBSOLETE
-	// rpc GetUserGroups(common.Void) returns (auth.GroupList);
-	// add user to group
-	// OBSOLETE
-	// rpc AddUserToGroup(auth.AddToGroupRequest) returns (common.Void);
-	// remove user from a group
-	// OBSOLETE
-	// rpc RemoveUserFromGroup(auth.RemoveFromGroupRequest) returns (common.Void);
-	// get all users for a group
-	// OBSOLETE
-	// rpc ListUsersInGroup(auth.ListGroupRequest) returns (auth.UserListResponse);
-	// get all groups associated (have access to) a given method
-	// OBSOLETE
-	// rpc GetGroupsForMethod(Method) returns (auth.GroupList);
-	// add a group to a Method (grant access to an rpc for a given group)
-	// returns the list of groups for this method PRIOR to the update
-	// OBSOLETE
-	// rpc AddGroupToMethod(MethodIDAndGroupID) returns (auth.GroupList);
-	// remove a group from a method (revoke access to an rpc for a given group)
-	// returns the list of groups for this method PRIOR to the update
-	// OBSOLETE
-	// rpc RemoveGroupFromMethod(MethodIDAndGroupID) returns (auth.GroupList);
-	// return list of methods a group as access to
-	// OBSOLETE
-	// rpc GetMethodsForGroups(auth.Group) returns (FullMethodList);
-	// gets the most recent logentries limited by some count
-	// OBSOLETE
-	// rpc GetMostRecentLogs(LogEntryRequest) returns (LogEntryList);
-	// gets the most recent logentries for the calling user
-	// OBSOLETE
-	// rpc GetMyMostRecentLogs(LogEntryRequest) returns (LogEntryList);
-	// sophisticated(ish) search for logs
-	// OBSOLETE
-	// rpc SearchLogs(LogSearchRequest) returns (LogEntryList);
-	// UNDOCUMENTED CALL, USE WITH CARE
-	// OBSOLETE
-	// rpc ListCalls(common.Void) returns (CallList);
-	// sophisticated(ish) search for errors which occured in the system
-	// OBSOLETE
-	// rpc SearchErrors(ErrorSearchRequest) returns (ErrorEntryList);
 	// ServiceNametoID (privileged)
 	ServiceNameToID(ctx context.Context, in *ServiceNameRequest, opts ...grpc.CallOption) (*ServiceIDResponse, error)
 }
@@ -1168,55 +1121,8 @@ func (c *rPCACLServiceClient) ServiceNameToID(ctx context.Context, in *ServiceNa
 type RPCACLServiceServer interface {
 	// given a serviceid for a service, this will return the rpcinterceptor service
 	GetServiceByID(context.Context, *ServiceByIDRequest) (*Service, error)
-	// given a userid for a service, this will return the rpcinterceptor service
+	// given a userid for a service, this will return the rpcinterceptor service (known user: scupdate)
 	GetServiceByUserID(context.Context, *ServiceByUserIDRequest) (*Service, error)
-	// (known means: a method of this service has requested authentication at least once.)
-	// rpc GetServices(common.Void) returns (ServiceList);
-	// get all methods currently known for a given service
-	// (known means: the method has requested authentication at least once.)
-	// rpc GetMethods(GetMethodsRequest) returns (MethodList);
-	// get all groups known to the auth service.
-	// essentially queries & caches the auth service
-	// OBSOLETE
-	// rpc GetUserGroups(common.Void) returns (auth.GroupList);
-	// add user to group
-	// OBSOLETE
-	// rpc AddUserToGroup(auth.AddToGroupRequest) returns (common.Void);
-	// remove user from a group
-	// OBSOLETE
-	// rpc RemoveUserFromGroup(auth.RemoveFromGroupRequest) returns (common.Void);
-	// get all users for a group
-	// OBSOLETE
-	// rpc ListUsersInGroup(auth.ListGroupRequest) returns (auth.UserListResponse);
-	// get all groups associated (have access to) a given method
-	// OBSOLETE
-	// rpc GetGroupsForMethod(Method) returns (auth.GroupList);
-	// add a group to a Method (grant access to an rpc for a given group)
-	// returns the list of groups for this method PRIOR to the update
-	// OBSOLETE
-	// rpc AddGroupToMethod(MethodIDAndGroupID) returns (auth.GroupList);
-	// remove a group from a method (revoke access to an rpc for a given group)
-	// returns the list of groups for this method PRIOR to the update
-	// OBSOLETE
-	// rpc RemoveGroupFromMethod(MethodIDAndGroupID) returns (auth.GroupList);
-	// return list of methods a group as access to
-	// OBSOLETE
-	// rpc GetMethodsForGroups(auth.Group) returns (FullMethodList);
-	// gets the most recent logentries limited by some count
-	// OBSOLETE
-	// rpc GetMostRecentLogs(LogEntryRequest) returns (LogEntryList);
-	// gets the most recent logentries for the calling user
-	// OBSOLETE
-	// rpc GetMyMostRecentLogs(LogEntryRequest) returns (LogEntryList);
-	// sophisticated(ish) search for logs
-	// OBSOLETE
-	// rpc SearchLogs(LogSearchRequest) returns (LogEntryList);
-	// UNDOCUMENTED CALL, USE WITH CARE
-	// OBSOLETE
-	// rpc ListCalls(common.Void) returns (CallList);
-	// sophisticated(ish) search for errors which occured in the system
-	// OBSOLETE
-	// rpc SearchErrors(ErrorSearchRequest) returns (ErrorEntryList);
 	// ServiceNametoID (privileged)
 	ServiceNameToID(context.Context, *ServiceNameRequest) (*ServiceIDResponse, error)
 }

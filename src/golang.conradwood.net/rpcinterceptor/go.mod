@@ -8,7 +8,7 @@ require (
 	golang.conradwood.net/apis/errorlogger v1.1.2103
 	golang.conradwood.net/apis/rpcaclapi v1.1.1746
 	golang.conradwood.net/apis/rpcinterceptor v1.1.2073
-	golang.conradwood.net/go-easyops v0.1.15337
+	golang.conradwood.net/go-easyops v0.1.15450
 	golang.org/x/net v0.5.0
 	google.golang.org/grpc v1.52.0
 )
