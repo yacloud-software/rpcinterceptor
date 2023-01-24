@@ -5,10 +5,10 @@ go 1.18
 require (
 	golang.conradwood.net/apis/auth v1.1.2106
 	golang.conradwood.net/apis/common v1.1.2106
-	golang.conradwood.net/apis/errorlogger v1.1.2106
+	golang.conradwood.net/apis/errorlogger v1.1.2125
 	golang.conradwood.net/apis/rpcaclapi v1.1.1746
 	golang.conradwood.net/apis/rpcinterceptor v1.1.2073
-	golang.conradwood.net/go-easyops v0.1.15584
+	golang.conradwood.net/go-easyops v0.1.15769
 	golang.org/x/net v0.5.0
 	google.golang.org/grpc v1.52.0
 )
